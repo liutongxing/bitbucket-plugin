@@ -51,9 +51,11 @@ public class BitBucketTrigger extends Trigger<Job<?, ?>> {
      */
     public void onPost(String triggeredByUser, final String payload) {
         final String pushBy = triggeredByUser;
+        LOGGER.log(Level.INFO,"begin onPost");
         getDescriptor().queue.execute(new Runnable() {
             private boolean runPolling() {
                 try {
+                    LOGGER.log(Level.INFO,"begin runPolling");
                     StreamTaskListener listener = new StreamTaskListener(getLogFile());
                     try {
                         PrintStream logger = listener.getLogger();
@@ -65,6 +67,7 @@ public class BitBucketTrigger extends Trigger<Job<?, ?>> {
                             logger.println("Changes found");
                         else
                             logger.println("No changes");
+                        LOGGER.log(Level.INFO,"poll result" + result);
                         return result;
                     } catch (Error e) {
                         e.printStackTrace(listener.error("Failed to record SCM polling"));
@@ -84,10 +87,12 @@ public class BitBucketTrigger extends Trigger<Job<?, ?>> {
             }
 
             public void run() {
+                LOGGER.log(Level.INFO,"begin to run");
                 if (runPolling()) {
                     String name = " #"+job.getNextBuildNumber();
                     BitBucketPushCause cause;
                     try {
+                        LOGGER.log(Level.INFO,"begin to find cause");
                         cause = new BitBucketPushCause(getLogFile(), pushBy);
                     } catch (IOException e) {
                         LOGGER.log(Level.WARNING, "Failed to parse the polling log",e);
