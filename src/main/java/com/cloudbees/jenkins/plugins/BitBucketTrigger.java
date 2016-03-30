@@ -88,7 +88,9 @@ public class BitBucketTrigger extends Trigger<Job<?, ?>> {
 
             public void run() {
                 LOGGER.log(Level.INFO,"begin to run");
-                if (runPolling()) {
+                boolean runPolling = runPolling();
+                runPolling = true; // Davis: ignore run polling result
+                if (runPolling) {
                     String name = " #"+job.getNextBuildNumber();
                     BitBucketPushCause cause;
                     try {
